@@ -20,12 +20,15 @@ enum TMDBEndpoint {
     
     private static let baseURL = "https://api.themoviedb.org/3"
     
-    /// API key - should be stored securely in production
+    /// API key - loaded from Info.plist (configured via Config.xcconfig)
     /// Get your API key from: https://www.themoviedb.org/settings/api
     private static var apiKey: String {
-        // TODO: Replace with your TMDB API key
-        // In production, store this in Keychain or use a secure configuration
-        return "YOUR_TMDB_API_KEY_HERE"
+        guard let apiKey = Bundle.main.object(forInfoDictionaryKey: "TMDB_API_KEY") as? String,
+              !apiKey.isEmpty,
+              apiKey != "$(TMDB_API_KEY)" else {
+            return ""
+        }
+        return apiKey
     }
     
     // MARK: - Path

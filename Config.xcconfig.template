@@ -1,0 +1,11 @@
+//
+//  Config.xcconfig.template
+//  MovieTrailer
+//
+//  Template for configuration file
+//  Copy this file to Config.xcconfig and add your actual API key
+//
+
+// TMDB API Key
+// Get your API key from: https://www.themoviedb.org/settings/api
+TMDB_API_KEY = YOUR_TMDB_API_KEY_HERE
