@@ -11,7 +11,7 @@ import SwiftUI
 @main
 struct MovieTrailerWidgets: WidgetBundle {
     var body: some Widget {
-        MovieTrailerWidgets()
-        MovieTrailerWidgetsLiveActivity()
+        //MovieTrailerWidgets()
+        WatchlistLiveActivity()
     }
 }
