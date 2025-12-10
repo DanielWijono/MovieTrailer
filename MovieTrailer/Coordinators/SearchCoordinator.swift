@@ -49,29 +49,13 @@ final class SearchCoordinator: ObservableObject, NavigationCoordinator {
         navigate(to: movie)
     }
     
-    // MARK: - Placeholder
+    // MARK: - View
     
     private func placeholderView() -> some View {
-        VStack(spacing: 20) {
-            Image(systemName: "magnifyingglass")
-                .font(.system(size: 60))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [.green, .blue],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-            
-            Text("Search")
-                .font(.title.bold())
-            
-            Text("Find your favorite movies")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(uiColor: .systemBackground))
-        .navigationTitle("Search")
+        let viewModel = SearchViewModel(
+            tmdbService: tmdbService,
+            watchlistManager: watchlistManager
+        )
+        return SearchView(viewModel: viewModel)
     }
 }
