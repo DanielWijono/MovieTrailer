@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import UIKit
 
 /// ViewModel for the Watchlist tab
 @MainActor
