@@ -40,11 +40,12 @@ struct MovieDetailView: View {
                     // Action buttons
                     actionButtons
                 }
-                .padding()
+                .padding(.horizontal)
+                .padding(.vertical, 16)
+                .padding(.bottom, 32)
             }
         }
         .background(Color(uiColor: .systemBackground))
-        .ignoresSafeArea(edges: .top)
     }
     
     // MARK: - Backdrop Header

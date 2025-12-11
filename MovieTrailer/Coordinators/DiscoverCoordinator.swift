@@ -15,6 +15,8 @@ final class DiscoverCoordinator: ObservableObject, NavigationCoordinator {
     // MARK: - Published Properties
     
     @Published var navigationPath = NavigationPath()
+    @Published var selectedMovie: Movie?
+    @Published var showingMovieDetail = false
     
     // MARK: - Dependencies
     
@@ -31,12 +33,7 @@ final class DiscoverCoordinator: ObservableObject, NavigationCoordinator {
     // MARK: - Coordinator Protocol
     
     var body: some View {
-        NavigationStack(path: Binding(
-            get: { self.navigationPath },
-            set: { self.navigationPath = $0 }
-        )) {
-            placeholderView()
-        }
+        DiscoverCoordinatorView(coordinator: self)
     }
     
     func start() {
@@ -46,21 +43,43 @@ final class DiscoverCoordinator: ObservableObject, NavigationCoordinator {
     // MARK: - Navigation
     
     func showMovieDetail(for movie: Movie) {
-        navigate(to: movie)
+        print("🎬 DiscoverCoordinator: Showing detail for \(movie.title)")
+        selectedMovie = movie
+        showingMovieDetail = true
     }
+}
+
+// MARK: - Coordinator View Wrapper
+
+struct DiscoverCoordinatorView: View {
+    @ObservedObject var coordinator: DiscoverCoordinator
     
-    // MARK: - View
-    
-    private func placeholderView() -> some View {
-        let viewModel = DiscoverViewModel(
-            tmdbService: tmdbService,
-            watchlistManager: watchlistManager
-        )
-        return DiscoverView(
-            viewModel: viewModel,
-            onMovieTap: { [weak self] movie in
-                self?.showMovieDetail(for: movie)
+    var body: some View {
+        NavigationStack(path: $coordinator.navigationPath) {
+            DiscoverView(
+                viewModel: DiscoverViewModel(
+                    tmdbService: coordinator.tmdbService,
+                    watchlistManager: coordinator.watchlistManager
+                ),
+                onMovieTap: { movie in
+                    print("🎬 DiscoverView: Movie tapped - \(movie.title)")
+                    coordinator.showMovieDetail(for: movie)
+                }
+            )
+        }
+        .sheet(isPresented: $coordinator.showingMovieDetail) {
+            if let movie = coordinator.selectedMovie {
+                MovieDetailView(
+                    movie: movie,
+                    isInWatchlist: coordinator.watchlistManager.contains(movie),
+                    onWatchlistToggle: {
+                        coordinator.watchlistManager.toggle(movie)
+                    },
+                    onClose: {
+                        coordinator.showingMovieDetail = false
+                    }
+                )
             }
-        )
+        }
     }
 }

@@ -130,7 +130,8 @@ struct MovieCard: View {
                 )
                 .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2)
         }
-        .buttonStyle(PlainButtonStyle())
+        .buttonStyle(.plain)
+        .buttonBorderShape(.circle)
     }
 }
 
