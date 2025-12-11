@@ -10,9 +10,11 @@ import SwiftUI
 struct DiscoverView: View {
     
     @StateObject private var viewModel: DiscoverViewModel
+    let onMovieTap: (Movie) -> Void
     
-    init(viewModel: DiscoverViewModel) {
+    init(viewModel: DiscoverViewModel, onMovieTap: @escaping (Movie) -> Void) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        self.onMovieTap = onMovieTap
     }
     
     var body: some View {
@@ -26,9 +28,7 @@ struct DiscoverView: View {
                     movies: viewModel.trendingMovies,
                     isLoading: viewModel.isLoadingTrending,
                     isInWatchlist: viewModel.isInWatchlist,
-                    onMovieTap: { movie in
-                        // Navigate to detail
-                    },
+                    onMovieTap: onMovieTap,
                     onWatchlistToggle: viewModel.toggleWatchlist
                 )
                 
@@ -40,9 +40,7 @@ struct DiscoverView: View {
                     movies: viewModel.popularMovies,
                     isLoading: viewModel.isLoadingPopular,
                     isInWatchlist: viewModel.isInWatchlist,
-                    onMovieTap: { movie in
-                        // Navigate to detail
-                    },
+                    onMovieTap: onMovieTap,
                     onWatchlistToggle: viewModel.toggleWatchlist
                 )
                 
@@ -54,9 +52,7 @@ struct DiscoverView: View {
                     movies: viewModel.topRatedMovies,
                     isLoading: viewModel.isLoadingTopRated,
                     isInWatchlist: viewModel.isInWatchlist,
-                    onMovieTap: { movie in
-                        // Navigate to detail
-                    },
+                    onMovieTap: onMovieTap,
                     onWatchlistToggle: viewModel.toggleWatchlist
                 )
             }
@@ -202,7 +198,7 @@ struct MovieCardSkeleton: View {
 struct DiscoverView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationStack {
-            DiscoverView(viewModel: .mock())
+            DiscoverView(viewModel: .mock(), onMovieTap: { _ in })
         }
     }
 }

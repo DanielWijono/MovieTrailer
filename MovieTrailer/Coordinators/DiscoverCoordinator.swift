@@ -56,6 +56,11 @@ final class DiscoverCoordinator: ObservableObject, NavigationCoordinator {
             tmdbService: tmdbService,
             watchlistManager: watchlistManager
         )
-        return DiscoverView(viewModel: viewModel)
+        return DiscoverView(
+            viewModel: viewModel,
+            onMovieTap: { [weak self] movie in
+                self?.showMovieDetail(for: movie)
+            }
+        )
     }
 }
