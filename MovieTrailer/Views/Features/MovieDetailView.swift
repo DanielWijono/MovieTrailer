@@ -387,7 +387,8 @@ struct MovieDetailView_Previews: PreviewProvider {
             movie: .sample,
             isInWatchlist: false,
             onWatchlistToggle: {},
-            onClose: {}
+            onClose: {},
+            tmdbService: .shared
         )
     }
 }

@@ -34,6 +34,7 @@ final class WatchlistCoordinator: ObservableObject, NavigationCoordinator {
     ) {
         self.watchlistManager = watchlistManager
         self.liveActivityManager = liveActivityManager
+        self.tmdbService = tmdbService
     }
     
     // MARK: - Coordinator Protocol
