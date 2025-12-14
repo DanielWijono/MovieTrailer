@@ -62,11 +62,28 @@ struct MovieDetailView: View {
                 TrailerPlayerView(
                     video: trailer,
                     onClose: {
+                        print("🎬 MovieDetailView: User closed trailer player")
                         showingTrailer = false
                         selectedTrailer = nil
                     }
                 )
+                .onAppear {
+                    print("🎬 MovieDetailView: fullScreenCover presenting trailer: \(trailer.name)")
+                }
+            } else {
+                Color.red.ignoresSafeArea()
+                    .overlay(
+                        Text("Error: No trailer selected")
+                            .foregroundColor(.white)
+                    )
+                    .onAppear {
+                        print("⚠️ MovieDetailView: fullScreenCover triggered but selectedTrailer is nil!")
+                    }
             }
+        }
+        .onChange(of: showingTrailer) { newValue in
+            print("🎬 MovieDetailView: showingTrailer changed to: \(newValue)")
+            print("🎬 MovieDetailView: selectedTrailer is: \(selectedTrailer?.name ?? "nil")")
         }
         .task {
             await loadTrailers()
@@ -266,8 +283,12 @@ struct MovieDetailView: View {
             if trailers.count == 1 {
                 // Single trailer - large button
                 Button {
+                    print("🎬 MovieDetailView: User tapped single trailer button")
+                    print("   Trailer: \(trailers[0].name)")
+                    print("   Video key: \(trailers[0].key)")
                     selectedTrailer = trailers[0]
                     showingTrailer = true
+                    print("   showingTrailer set to: \(showingTrailer)")
                 } label: {
                     HStack(spacing: 12) {
                         Image(systemName: "play.circle.fill")
@@ -302,8 +323,12 @@ struct MovieDetailView: View {
                             TrailerCardView(
                                 trailer: trailer,
                                 onTap: {
+                                    print("🎬 MovieDetailView: User tapped trailer card")
+                                    print("   Trailer: \(trailer.name)")
+                                    print("   Video key: \(trailer.key)")
                                     selectedTrailer = trailer
                                     showingTrailer = true
+                                    print("   showingTrailer set to: \(showingTrailer)")
                                 }
                             )
                         }
@@ -316,6 +341,7 @@ struct MovieDetailView: View {
     // MARK: - Helper Methods
     
     private func loadTrailers() async {
+        print("🎬 MovieDetailView: Starting to load trailers for movie ID: \(movie.id)")
         isLoadingTrailers = true
         defer { isLoadingTrailers = false }
         
@@ -323,9 +349,13 @@ struct MovieDetailView: View {
             let videoResponse = try await tmdbService.fetchVideos(for: movie.id)
             await MainActor.run {
                 trailers = videoResponse.allTrailers
+                print("🎬 MovieDetailView: Successfully loaded \(trailers.count) trailers")
+                for (index, trailer) in trailers.enumerated() {
+                    print("   Trailer \(index + 1): \(trailer.name) - Key: \(trailer.key) - Site: \(trailer.site)")
+                }
             }
         } catch {
-            print("⚠️ Failed to load trailers: \(error)")
+            print("⚠️ MovieDetailView: Failed to load trailers: \(error)")
             // Silently fail - trailers are optional
         }
     }
