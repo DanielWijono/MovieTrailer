@@ -13,15 +13,27 @@ struct YouTubePlayerView: UIViewRepresentable {
     
     let videoKey: String
     
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+    
     func makeUIView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
         configuration.allowsInlineMediaPlayback = true
         configuration.mediaTypesRequiringUserActionForPlayback = []
         
+        // Enable debugging (optional)
+        #if DEBUG
+        if #available(iOS 16.4, *) {
+            configuration.preferences.isInspectable = true
+        }
+        #endif
+        
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.scrollView.isScrollEnabled = false
         webView.backgroundColor = .black
         webView.isOpaque = false
+        webView.navigationDelegate = context.coordinator
         
         return webView
     }
@@ -71,7 +83,23 @@ struct YouTubePlayerView: UIViewRepresentable {
         </html>
         """
         
-        webView.loadHTMLString(html, baseURL: nil)
+        webView.loadHTMLString(html, baseURL: URL(string: "https://www.youtube.com"))
+    }
+    
+    // MARK: - Coordinator
+    
+    class Coordinator: NSObject, WKNavigationDelegate {
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            print("✅ YouTube player loaded successfully")
+        }
+        
+        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+            print("❌ YouTube player failed to load: \(error.localizedDescription)")
+        }
+        
+        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+            print("❌ YouTube player provisional navigation failed: \(error.localizedDescription)")
+        }
     }
 }
 
