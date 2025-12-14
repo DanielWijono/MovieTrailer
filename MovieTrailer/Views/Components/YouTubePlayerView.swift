@@ -22,18 +22,18 @@ struct YouTubePlayerView: UIViewRepresentable {
         configuration.allowsInlineMediaPlayback = true
         configuration.mediaTypesRequiringUserActionForPlayback = []
         
-        // Enable debugging (optional)
-        #if DEBUG
-        if #available(iOS 16.4, *) {
-            configuration.preferences.isInspectable = true
-        }
-        #endif
-        
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.scrollView.isScrollEnabled = false
         webView.backgroundColor = .black
         webView.isOpaque = false
         webView.navigationDelegate = context.coordinator
+        
+        // Enable debugging (optional)
+        #if DEBUG
+        if #available(iOS 16.4, *) {
+            webView.isInspectable = true
+        }
+        #endif
         
         return webView
     }
