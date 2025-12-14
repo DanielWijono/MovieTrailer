@@ -11,9 +11,11 @@ struct SearchView: View {
     
     @StateObject private var viewModel: SearchViewModel
     @FocusState private var isSearchFocused: Bool
+    let onMovieTap: (Movie) -> Void
     
-    init(viewModel: SearchViewModel) {
+    init(viewModel: SearchViewModel, onMovieTap: @escaping (Movie) -> Void = { _ in }) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        self.onMovieTap = onMovieTap
     }
     
     var body: some View {
@@ -92,7 +94,7 @@ struct SearchView: View {
                         movie: movie,
                         isInWatchlist: viewModel.isInWatchlist(movie),
                         onTap: {
-                            // Navigate to detail
+                            onMovieTap(movie)
                         },
                         onWatchlistToggle: {
                             viewModel.toggleWatchlist(for: movie)

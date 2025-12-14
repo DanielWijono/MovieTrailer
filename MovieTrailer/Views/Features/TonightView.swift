@@ -10,9 +10,11 @@ import SwiftUI
 struct TonightView: View {
     
     @StateObject private var viewModel: TonightViewModel
+    let onMovieTap: (Movie) -> Void
     
-    init(viewModel: TonightViewModel) {
+    init(viewModel: TonightViewModel, onMovieTap: @escaping (Movie) -> Void = { _ in }) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        self.onMovieTap = onMovieTap
     }
     
     var body: some View {
@@ -83,7 +85,7 @@ struct TonightView: View {
                             movie: movie,
                             isInWatchlist: viewModel.isInWatchlist(movie),
                             onTap: {
-                                // Navigate to detail
+                                onMovieTap(movie)
                             },
                             onWatchlistToggle: {
                                 viewModel.toggleWatchlist(for: movie)

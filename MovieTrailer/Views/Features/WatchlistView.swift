@@ -12,9 +12,11 @@ struct WatchlistView: View {
     @StateObject private var viewModel: WatchlistViewModel
     @State private var showingSortOptions = false
     @State private var showingShareSheet = false
+    let onItemTap: (WatchlistItem) -> Void
     
-    init(viewModel: WatchlistViewModel) {
+    init(viewModel: WatchlistViewModel, onItemTap: @escaping (WatchlistItem) -> Void = { _ in }) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        self.onItemTap = onItemTap
     }
     
     var body: some View {
@@ -62,7 +64,7 @@ struct WatchlistView: View {
                         WatchlistItemRow(
                             item: item,
                             onTap: {
-                                // Navigate to detail
+                                onItemTap(item)
                             },
                             onDelete: {
                                 withAnimation {

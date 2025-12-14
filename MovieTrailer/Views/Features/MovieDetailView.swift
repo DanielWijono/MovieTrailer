@@ -20,10 +20,10 @@ struct MovieDetailView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                // Backdrop header
+                // Backdrop header - ignores top safe area only
                 backdropHeader
                 
-                // Content
+                // Content - respects all safe areas with proper padding
                 VStack(alignment: .leading, spacing: 24) {
                     // Title and rating
                     titleSection
@@ -40,62 +40,64 @@ struct MovieDetailView: View {
                     // Action buttons
                     actionButtons
                 }
-                .padding(.horizontal, 24) // Increased padding for safety
+                .padding(.horizontal, 20)
                 .padding(.vertical, 16)
-                .frame(maxWidth: .infinity, alignment: .leading) // Ensure full width
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .ignoresSafeArea(.container, edges: .top)
         .background(Color(uiColor: .systemBackground))
-        // Removed .ignoresSafeArea to prevent scaling issues
+        .ignoresSafeArea(edges: .top) // Only ignore top for backdrop bleed
     }
     
     // MARK: - Backdrop Header
     
     private var backdropHeader: some View {
-        ZStack(alignment: .topLeading) {
-            // Backdrop image
-            KFImage(movie.backdropURL)
-                .placeholder {
-                    Rectangle()
-                        .fill(
-                            LinearGradient(
-                                colors: [.blue.opacity(0.3), .purple.opacity(0.3)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
+        GeometryReader { geometry in
+            ZStack(alignment: .topLeading) {
+                // Backdrop image - constrained to geometry width
+                KFImage(movie.backdropURL)
+                    .placeholder {
+                        Rectangle()
+                            .fill(
+                                LinearGradient(
+                                    colors: [.blue.opacity(0.3), .purple.opacity(0.3)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
                             )
+                    }
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: geometry.size.width, height: 280)
+                    .clipped()
+                
+                // Gradient overlay
+                LinearGradient(
+                    colors: [
+                        Color.black.opacity(0.7),
+                        Color.black.opacity(0.3),
+                        Color.clear
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .frame(width: geometry.size.width, height: 280)
+                
+                // Close button
+                Button(action: onClose) {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(
+                            Circle()
+                                .fill(.ultraThinMaterial)
                         )
                 }
-                .resizable()
-                .aspectRatio(16/9, contentMode: .fill)
-                .frame(height: 280)
-                .clipped()
-            
-            // Gradient overlay
-            LinearGradient(
-                colors: [
-                    Color.black.opacity(0.7),
-                    Color.black.opacity(0.3),
-                    Color.clear
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .frame(height: 280)
-            
-            // Close button
-            Button(action: onClose) {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.title2)
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(
-                        Circle()
-                            .fill(.ultraThinMaterial)
-                    )
+                .padding()
             }
-            .padding()
         }
+        .frame(height: 280)
     }
     
     // MARK: - Title Section

@@ -75,6 +75,9 @@ struct DiscoverCoordinatorView: View {
                     onWatchlistToggle: {
                         coordinator.watchlistManager.toggle(movie)
                     },
+                    onClose: {
+                        coordinator.showingMovieDetail = false
+                    }
                 )
             }
         }

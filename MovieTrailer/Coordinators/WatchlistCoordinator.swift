@@ -16,6 +16,8 @@ final class WatchlistCoordinator: ObservableObject, NavigationCoordinator {
     
     @Published var navigationPath = NavigationPath()
     @Published var showingShareSheet = false
+    @Published var selectedMovie: Movie?
+    @Published var showingMovieDetail = false
     
     // MARK: - Dependencies
     
@@ -35,12 +37,7 @@ final class WatchlistCoordinator: ObservableObject, NavigationCoordinator {
     // MARK: - Coordinator Protocol
     
     var body: some View {
-        NavigationStack(path: Binding(
-            get: { self.navigationPath },
-            set: { self.navigationPath = $0 }
-        )) {
-            placeholderView()
-        }
+        WatchlistCoordinatorView(coordinator: self)
     }
     
     func start() {
@@ -50,21 +47,46 @@ final class WatchlistCoordinator: ObservableObject, NavigationCoordinator {
     // MARK: - Navigation
     
     func showMovieDetail(for item: WatchlistItem) {
-        let movie = item.toMovie()
-        navigate(to: movie)
+        selectedMovie = item.toMovie()
+        showingMovieDetail = true
     }
     
     func shareWatchlist() {
         showingShareSheet = true
     }
+}
+
+// MARK: - Coordinator View Wrapper
+
+struct WatchlistCoordinatorView: View {
+    @ObservedObject var coordinator: WatchlistCoordinator
     
-    // MARK: - View
-    
-    private func placeholderView() -> some View {
-        let viewModel = WatchlistViewModel(
-            watchlistManager: watchlistManager,
-            liveActivityManager: liveActivityManager
-        )
-        return WatchlistView(viewModel: viewModel)
+    var body: some View {
+        NavigationStack(path: $coordinator.navigationPath) {
+            WatchlistView(
+                viewModel: WatchlistViewModel(
+                    watchlistManager: coordinator.watchlistManager,
+                    liveActivityManager: coordinator.liveActivityManager
+                ),
+                onItemTap: { item in
+                    coordinator.showMovieDetail(for: item)
+                }
+            )
+        }
+        .fullScreenCover(isPresented: $coordinator.showingMovieDetail) {
+            if let movie = coordinator.selectedMovie {
+                MovieDetailView(
+                    movie: movie,
+                    isInWatchlist: true, // Always true for watchlist items
+                    onWatchlistToggle: {
+                        coordinator.watchlistManager.toggle(movie)
+                        // If removed, detail view stays open but state changes
+                    },
+                    onClose: {
+                        coordinator.showingMovieDetail = false
+                    }
+                )
+            }
+        }
     }
 }

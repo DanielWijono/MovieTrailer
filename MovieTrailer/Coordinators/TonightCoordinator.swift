@@ -15,6 +15,8 @@ final class TonightCoordinator: ObservableObject, NavigationCoordinator {
     // MARK: - Published Properties
     
     @Published var navigationPath = NavigationPath()
+    @Published var selectedMovie: Movie?
+    @Published var showingMovieDetail = false
     
     // MARK: - Dependencies
     
@@ -31,12 +33,7 @@ final class TonightCoordinator: ObservableObject, NavigationCoordinator {
     // MARK: - Coordinator Protocol
     
     var body: some View {
-        NavigationStack(path: Binding(
-            get: { self.navigationPath },
-            set: { self.navigationPath = $0 }
-        )) {
-            placeholderView()
-        }
+        TonightCoordinatorView(coordinator: self)
     }
     
     func start() {
@@ -46,16 +43,41 @@ final class TonightCoordinator: ObservableObject, NavigationCoordinator {
     // MARK: - Navigation
     
     func showMovieDetail(for movie: Movie) {
-        navigate(to: movie)
+        selectedMovie = movie
+        showingMovieDetail = true
     }
+}
+
+// MARK: - Coordinator View Wrapper
+
+struct TonightCoordinatorView: View {
+    @ObservedObject var coordinator: TonightCoordinator
     
-    // MARK: - View
-    
-    private func placeholderView() -> some View {
-        let viewModel = TonightViewModel(
-            tmdbService: tmdbService,
-            watchlistManager: watchlistManager
-        )
-        return TonightView(viewModel: viewModel)
+    var body: some View {
+        NavigationStack(path: $coordinator.navigationPath) {
+            TonightView(
+                viewModel: TonightViewModel(
+                    tmdbService: coordinator.tmdbService,
+                    watchlistManager: coordinator.watchlistManager
+                ),
+                onMovieTap: { movie in
+                    coordinator.showMovieDetail(for: movie)
+                }
+            )
+        }
+        .fullScreenCover(isPresented: $coordinator.showingMovieDetail) {
+            if let movie = coordinator.selectedMovie {
+                MovieDetailView(
+                    movie: movie,
+                    isInWatchlist: coordinator.watchlistManager.contains(movie),
+                    onWatchlistToggle: {
+                        coordinator.watchlistManager.toggle(movie)
+                    },
+                    onClose: {
+                        coordinator.showingMovieDetail = false
+                    }
+                )
+            }
+        }
     }
 }
