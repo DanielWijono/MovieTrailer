@@ -40,7 +40,7 @@ struct MovieDetailView: View {
                     // Action buttons
                     actionButtons
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, 24) // Increased padding for safety
                 .padding(.vertical, 16)
                 .frame(maxWidth: .infinity, alignment: .leading) // Ensure full width
             }
