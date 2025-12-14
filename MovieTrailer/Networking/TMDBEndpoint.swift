@@ -106,6 +106,9 @@ enum TMDBEndpoint {
         case .movieDetails:
             // Cache movie details for 1 day
             return .returnCacheDataElseLoad
+        case .videos:
+            // Cache videos for 1 day (trailers don't change often)
+            return .returnCacheDataElseLoad
         case .genres:
             // Cache genres indefinitely (they rarely change)
             return .returnCacheDataElseLoad
@@ -158,6 +161,8 @@ extension TMDBEndpoint {
             return "Search: \"\(query)\" (Page \(page))"
         case .movieDetails(let id):
             return "Movie Details (ID: \(id))"
+        case .videos(let movieId):
+            return "Videos for Movie (ID: \(movieId))"
         case .genres:
             return "Genre List"
         }
