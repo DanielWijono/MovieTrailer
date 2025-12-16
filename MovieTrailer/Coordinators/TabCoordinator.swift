@@ -103,37 +103,37 @@ final class TabCoordinator: ObservableObject, TabCoordinatorProtocol {
     // MARK: - Coordinator Protocol
     
     var body: some View {
-        TabView(selection: Binding(
-            get: { self.selectedTab },
-            set: { self.selectedTab = $0 }
-        )) {
-            // Discover Tab
-            discoverTab()
-                .tabItem {
-                    Label(Tab.discover.title, systemImage: selectedTab == Tab.discover.rawValue ? Tab.discover.iconFilled : Tab.discover.icon)
+        ZStack(alignment: .bottom) {
+            // Content view switcher
+            Group {
+                switch selectedTab {
+                case Tab.discover.rawValue:
+                    discoverTab()
+                case Tab.tonight.rawValue:
+                    tonightTab()
+                case Tab.search.rawValue:
+                    searchTab()
+                case Tab.watchlist.rawValue:
+                    watchlistTab()
+                default:
+                    discoverTab()
                 }
-                .tag(Tab.discover.rawValue)
+            }
+            .ignoresSafeArea(edges: .bottom)
             
-            // Tonight Tab
-            tonightTab()
-                .tabItem {
-                    Label(Tab.tonight.title, systemImage: selectedTab == Tab.tonight.rawValue ? Tab.tonight.iconFilled : Tab.tonight.icon)
-                }
-                .tag(Tab.tonight.rawValue)
-            
-            // Search Tab
-            searchTab()
-                .tabItem {
-                    Label(Tab.search.title, systemImage: Tab.search.icon)
-                }
-                .tag(Tab.search.rawValue)
-            
-            // Watchlist Tab
-            watchlistTab()
-                .tabItem {
-                    Label(Tab.watchlist.title, systemImage: selectedTab == Tab.watchlist.rawValue ? Tab.watchlist.iconFilled : Tab.watchlist.icon)
-                }
-                .tag(Tab.watchlist.rawValue)
+            // Custom glassmorphism tab bar
+            GlassTabBar(
+                selectedTab: Binding(
+                    get: { self.selectedTab },
+                    set: { self.selectedTab = $0 }
+                ),
+                tabs: [
+                    TabItem(tag: Tab.discover.rawValue, icon: Tab.discover.icon, iconFilled: Tab.discover.iconFilled, title: Tab.discover.title),
+                    TabItem(tag: Tab.tonight.rawValue, icon: Tab.tonight.icon, iconFilled: Tab.tonight.iconFilled, title: Tab.tonight.title),
+                    TabItem(tag: Tab.search.rawValue, icon: Tab.search.icon, iconFilled: Tab.search.iconFilled, title: Tab.search.title),
+                    TabItem(tag: Tab.watchlist.rawValue, icon: Tab.watchlist.icon, iconFilled: Tab.watchlist.iconFilled, title: Tab.watchlist.title)
+                ]
+            )
         }
         .onAppear {
             self.start()
