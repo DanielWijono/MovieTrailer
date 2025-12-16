@@ -19,40 +19,53 @@ struct SearchView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Search bar
-            searchBar
+        ZStack {
+            // Glassmorphism animated background
+            GlassBackgroundView()
             
-            // Content
-            if viewModel.isSearching {
-                LoadingView()
-            } else if let error = viewModel.error, !viewModel.searchResults.isEmpty {
-                ErrorView(error: error) {
-                    viewModel.search()
+            VStack(spacing: 0) {
+                // Premium glass search bar
+                searchBar
+                    .padding(.top, 8)
+                
+                // Content
+                if viewModel.isSearching {
+                    LoadingView()
+                } else if let error = viewModel.error, !viewModel.searchResults.isEmpty {
+                    ErrorView(error: error) {
+                        viewModel.search()
+                    }
+                } else if viewModel.searchQuery.isEmpty {
+                    emptySearchState
+                } else if viewModel.searchResults.isEmpty {
+                    noResultsState
+                } else {
+                    searchResultsView
                 }
-            } else if viewModel.searchQuery.isEmpty {
-                emptySearchState
-            } else if viewModel.searchResults.isEmpty {
-                noResultsState
-            } else {
-                searchResultsView
             }
         }
-        .background(Color(uiColor: .systemBackground))
-        .navigationTitle("Search")
-        .navigationBarTitleDisplayMode(.large)
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
     }
     
     // MARK: - Search Bar
     
     private var searchBar: some View {
         HStack(spacing: 12) {
-            HStack(spacing: 8) {
+            HStack(spacing: 12) {
                 Image(systemName: "magnifyingglass")
-                    .foregroundColor(.secondary)
+                    .font(.title3)
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.blue, .purple],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
                 
                 TextField("Search movies...", text: $viewModel.searchQuery)
                     .textFieldStyle(.plain)
+                    .foregroundColor(.white)
                     .focused($isSearchFocused)
                     .autocorrectionDisabled()
                     .onChange(of: viewModel.searchQuery) { _ in
@@ -65,17 +78,15 @@ struct SearchView: View {
                         isSearchFocused = true
                     } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.white.opacity(0.6))
                     }
                 }
             }
-            .padding(12)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(uiColor: .systemGray6))
-            )
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            .glassCard()
         }
-        .padding()
+        .padding(.horizontal)
     }
     
     // MARK: - Search Results
@@ -103,6 +114,7 @@ struct SearchView: View {
                 }
             }
             .padding(.horizontal)
+            .padding(.top, 20)
             .padding(.bottom, 32)
         }
     }
@@ -111,24 +123,48 @@ struct SearchView: View {
     
     private var emptySearchState: some View {
         VStack(spacing: 24) {
-            Image(systemName: "magnifyingglass")
-                .font(.system(size: 80))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [.blue, .purple],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+            ZStack {
+                // Glow effect
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                Color.blue.opacity(0.2),
+                                Color.purple.opacity(0.1),
+                                Color.clear
+                            ],
+                            center: .center,
+                            startRadius: 20,
+                            endRadius: 120
+                        )
                     )
-                )
+                    .frame(width: 200, height: 200)
+                
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 80))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.blue, .purple],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+            }
             
-            Text("Search for Movies")
-                .font(.title2.bold())
-            
-            Text("Find your favorite movies, discover new ones, and add them to your watchlist")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 40)
+            VStack(spacing: 12) {
+                Text("Search for Movies")
+                    .font(.title2.bold())
+                    .foregroundColor(.white)
+                
+                Text("Find your favorite movies, discover new ones, and add them to your watchlist")
+                    .font(.subheadline)
+                    .foregroundColor(.white.opacity(0.7))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 40)
+            }
+            .padding()
+            .glassCard()
+            .padding(.horizontal)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -137,24 +173,48 @@ struct SearchView: View {
     
     private var noResultsState: some View {
         VStack(spacing: 24) {
-            Image(systemName: "film.stack")
-                .font(.system(size: 80))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [.gray, .secondary],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+            ZStack {
+                // Glow effect
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                Color.gray.opacity(0.2),
+                                Color.secondary.opacity(0.1),
+                                Color.clear
+                            ],
+                            center: .center,
+                            startRadius: 20,
+                            endRadius: 100
+                        )
                     )
-                )
+                    .frame(width: 160, height: 160)
+                
+                Image(systemName: "film.stack")
+                    .font(.system(size: 80))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.gray, .secondary],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+            }
             
-            Text("No Results Found")
-                .font(.title2.bold())
-            
-            Text("Try searching with different keywords")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 40)
+            VStack(spacing: 12) {
+                Text("No Results Found")
+                    .font(.title2.bold())
+                    .foregroundColor(.white)
+                
+                Text("Try searching with different keywords")
+                    .font(.subheadline)
+                    .foregroundColor(.white.opacity(0.7))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 40)
+            }
+            .padding()
+            .glassCard()
+            .padding(.horizontal)
             
             Button {
                 viewModel.clearSearch()

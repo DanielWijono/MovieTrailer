@@ -34,13 +34,13 @@ struct LoadingView: View {
                         .repeatForever(autoreverses: false),
                     value: isAnimating
                 )
+                .shadow(color: Color.purple.opacity(0.3), radius: 20, x: 0, y: 10)
             
             Text("Loading...")
                 .font(.headline)
-                .foregroundColor(.secondary)
+                .foregroundColor(.white)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(.ultraThinMaterial)
         .onAppear {
             isAnimating = true
         }
