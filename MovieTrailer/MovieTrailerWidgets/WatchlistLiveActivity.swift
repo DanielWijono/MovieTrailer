@@ -2,79 +2,176 @@
 //  WatchlistLiveActivity.swift
 //  MovieTrailerWidgets
 //
-//  Created by Silverius Daniel Wijono on 09/12/25.
+//  Premium Live Activity UI with glassmorphism design
 //
 
 import ActivityKit
 import WidgetKit
 import SwiftUI
 
-struct MovieTrailerWidgetsAttributes: ActivityAttributes {
-    public struct ContentState: Codable, Hashable {
-        // Dynamic stateful properties about your activity go here!
-        var emoji: String
-    }
-
-    // Fixed non-changing properties about your activity go here!
-    var name: String
-}
-
 struct WatchlistLiveActivity: Widget {
     var body: some WidgetConfiguration {
-        ActivityConfiguration(for: MovieTrailerWidgetsAttributes.self) { context in
+        ActivityConfiguration(for: WatchlistActivityAttributes.self) { context in
             // Lock screen/banner UI goes here
-            VStack {
-                Text("Hello \(context.state.emoji)")
-            }
-            .activityBackgroundTint(Color.cyan)
-            .activitySystemActionForegroundColor(Color.black)
-
-        } dynamicIsland: { context in
+            lockScreenView(context: context)
+        } dynamicIsland: {context in
             DynamicIsland {
-                // Expanded UI goes here.  Compose the expanded UI through
-                // various regions, like leading/trailing/center/bottom
+                // Expanded UI
                 DynamicIslandExpandedRegion(.leading) {
-                    Text("Leading")
+                    // Movie poster thumbnail
+                    if let posterURL = context.attributes.posterURL {
+                        AsyncImage(url: posterURL) { image in
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        } placeholder: {
+                            Color.blue.opacity(0.3)
+                        }
+                        .frame(width: 50, height: 75)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
                 }
                 DynamicIslandExpandedRegion(.trailing) {
-                    Text("Trailing")
+                    // Rating and countdown
+                    VStack(alignment: .trailing, spacing: 4) {
+                        HStack(spacing: 2) {
+                            Image(systemName: "star.fill")
+                                .font(.caption2)
+                                .foregroundColor(.yellow)
+                            Text(context.attributes.formattedRating)
+                                .font(.caption.bold())
+                        }
+                        
+                        Text(context.state.timeUntilTonight)
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                DynamicIslandExpandedRegion(.center) {
+                    // Movie title
+                    Text(context.attributes.movieTitle)
+                        .font(.subheadline.bold())
+                        .lineLimit(2)
+                        .multilineTextAlignment(.center)
                 }
                 DynamicIslandExpandedRegion(.bottom) {
-                    Text("Bottom \(context.state.emoji)")
-                    // more content
+                    // Progress bar and message
+                    VStack(spacing: 8) {
+                        // Progress to tonight
+                        GeometryReader { geometry in
+                            ZStack(alignment: .leading) {
+                                // Background
+                                Capsule()
+                                    .fill(Color.gray.opacity(0.2))
+                                
+                                // Progress
+                                Capsule()
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [.blue, .purple],
+                                            startPoint: .leading,
+                                            endPoint: .trailing
+                                        )
+                                    )
+                                    .frame(width: geometry.size.width * context.state.progressToTonight)
+                            }
+                        }
+                        .frame(height: 6)
+                        
+                        Text(context.state.message)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
                 }
             } compactLeading: {
-                Text("L")
+                // Star icon
+                Image(systemName: "star.fill")
+                    .foregroundColor(.yellow)
             } compactTrailing: {
-                Text("T \(context.state.emoji)")
+                // Countdown
+                Text(context.state.timeUntilTonight)
+                    .font(.caption2.bold())
+                    .foregroundColor(.white)
             } minimal: {
-                Text(context.state.emoji)
+                // Just star icon
+                Image(systemName: "star.fill")
+                    .foregroundColor(.yellow)
             }
-            .widgetURL(URL(string: "http://www.apple.com"))
-            .keylineTint(Color.red)
+            .keylineTint(Color.purple)
         }
     }
-}
-
-extension MovieTrailerWidgetsAttributes {
-    fileprivate static var preview: MovieTrailerWidgetsAttributes {
-        MovieTrailerWidgetsAttributes(name: "World")
+    
+    // MARK: - Lock Screen View
+    
+    @ViewBuilder
+    private func lockScreenView(context: ActivityViewContext<WatchlistActivityAttributes>) -> some View {
+        HStack(spacing: 16) {
+            // Movie poster
+            if let posterURL = context.attributes.posterURL {
+                AsyncImage(url: posterURL) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                } placeholder: {
+                    LinearGradient(
+                        colors: [.blue.opacity(0.3), .purple.opacity(0.3)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                }
+                .frame(width: 60, height: 90)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+            
+            // Info
+            VStack(alignment: .leading, spacing: 8) {
+                Text(context.attributes.movieTitle)
+                    .font(.headline.bold())
+                    .lineLimit(2)
+                
+                // Rating
+                HStack(spacing: 4) {
+                    ForEach(0..<5) { index in
+                        Image(systemName: index < Int(context.attributes.rating / 2) ? "star.fill" : "star")
+                            .font(.caption2)
+                            .foregroundColor(.yellow)
+                    }
+                    Text(context.attributes.formattedRating)
+                        .font(.caption.bold())
+                }
+                
+                Spacer()
+                
+                // Countdown
+                HStack(spacing: 8) {
+                    Image(systemName: "clock.fill")
+                        .font(.caption)
+                    Text("\(context.state.timeUntilTonight) until tonight")
+                        .font(.caption)
+                }
+                .foregroundColor(.secondary)
+            }
+            
+            Spacer()
+        }
+        .padding(16)
+        .background(
+            LinearGradient(
+                colors: [
+                    Color.blue.opacity(0.2),
+                    Color.purple.opacity(0.2)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
     }
 }
 
-extension MovieTrailerWidgetsAttributes.ContentState {
-    fileprivate static var smiley: MovieTrailerWidgetsAttributes.ContentState {
-        MovieTrailerWidgetsAttributes.ContentState(emoji: "😀")
-     }
-     
-     fileprivate static var starEyes: MovieTrailerWidgetsAttributes.ContentState {
-         MovieTrailerWidgetsAttributes.ContentState(emoji: "🤩")
-     }
-}
+// MARK: - Preview
 
-#Preview("Notification", as: .content, using: MovieTrailerWidgetsAttributes.preview) {
+#Preview("Notification", as: .content, using: WatchlistActivityAttributes.sample) {
    WatchlistLiveActivity()
 } contentStates: {
-    MovieTrailerWidgetsAttributes.ContentState.smiley
-    MovieTrailerWidgetsAttributes.ContentState.starEyes
+    WatchlistActivityAttributes.sampleState
 }
