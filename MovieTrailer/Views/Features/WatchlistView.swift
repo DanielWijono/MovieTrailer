@@ -21,15 +21,17 @@ struct WatchlistView: View {
     
     var body: some View {
         ZStack {
+            // Glassmorphism animated background
+            GlassBackgroundView()
+            
             if viewModel.isEmpty {
                 emptyStateView
             } else {
                 watchlistContent
             }
         }
-        .background(Color(uiColor: .systemBackground))
-        .navigationTitle("Watchlist")
-        .navigationBarTitleDisplayMode(.large)
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if !viewModel.isEmpty {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -99,9 +101,9 @@ struct WatchlistView: View {
                             endPoint: .trailing
                         )
                     )
-                Text("Movies")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                 Text("Movies")
+                     .font(.caption)
+                     .foregroundColor(.white.opacity(0.7))
             }
             
             Divider()
@@ -112,34 +114,18 @@ struct WatchlistView: View {
                     Image(systemName: "bookmark.fill")
                         .font(.caption2)
                         .foregroundColor(.yellow)
-                    Text("Sorted by")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                     Text("Sorted by")
+                         .font(.caption)
+                         .foregroundColor(.white.opacity(0.7))
                 }
-                Text(viewModel.sortOption.displayName)
-                    .font(.subheadline.bold())
+                 Text(viewModel.sortOption.displayName)
+                     .font(.subheadline.bold())
+                     .foregroundColor(.white)
             }
         }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(.ultraThinMaterial)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    Color.white.opacity(0.2),
-                                    Color.white.opacity(0.05)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                )
-        )
-        .padding(.horizontal)
+         .padding()
+         .glassCard()
+         .padding(.horizontal)
     }
     
     // MARK: - Sort Menu
@@ -173,30 +159,53 @@ struct WatchlistView: View {
     }
     
     // MARK: - Empty State
-    
-    private var emptyStateView: some View {
-        VStack(spacing: 24) {
-            Image(systemName: "bookmark.slash")
-                .font(.system(size: 80))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [.purple, .pink],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-            
-            Text("Your Watchlist is Empty")
-                .font(.title2.bold())
-            
-            Text("Start adding movies to your watchlist to keep track of what you want to watch!")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 40)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
+        private var emptyStateView: some View {
+         VStack(spacing: 24) {
+             ZStack {
+                 // Glow effect
+                 Circle()
+                     .fill(
+                         RadialGradient(
+                             colors: [
+                                 Color.purple.opacity(0.2),
+                                 Color.pink.opacity(0.1),
+                                 Color.clear
+                             ],
+                             center: .center,
+                             startRadius: 20,
+                             endRadius: 120
+                         )
+                     )
+                     .frame(width: 200, height: 200)
+                 
+                 Image(systemName: "bookmark.slash")
+                     .font(.system(size: 80))
+                     .foregroundStyle(
+                         LinearGradient(
+                             colors: [.purple, .pink],
+                             startPoint: .topLeading,
+                             endPoint: .bottomTrailing
+                         )
+                     )
+             }
+             
+             VStack(spacing: 12) {
+                 Text("Your Watchlist is Empty")
+                     .font(.title2.bold())
+                     .foregroundColor(.white)
+                 
+                 Text("Start adding movies to your watchlist to keep track of what you want to watch!")
+                     .font(.subheadline)
+                     .foregroundColor(.white.opacity(0.7))
+                     .multilineTextAlignment(.center)
+                     .padding(.horizontal, 40)
+             }
+             .padding()
+             .glassCard()
+             .padding(.horizontal)
+         }
+         .frame(maxWidth: .infinity, maxHeight: .infinity)
+     }
 }
 
 // MARK: - Watchlist Item Row
@@ -230,28 +239,29 @@ struct WatchlistItemRow: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8))
                 
                 // Info
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(item.title)
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                        .lineLimit(2)
-                    
-                    if let year = item.releaseYear {
-                        Text(year)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    
-                    HStack(spacing: 4) {
-                        Image(systemName: "star.fill")
-                            .font(.caption2)
-                            .foregroundColor(.yellow)
-                        
-                        Text(item.formattedRating)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                }
+                 VStack(alignment: .leading, spacing: 6) {
+                     Text(item.title)
+                         .font(.headline)
+                         .foregroundColor(.white)
+                         .lineLimit(2)
+                     
+                     HStack(spacing: 8) {
+                         // Use RatingView for compact rating display
+                         RatingView(rating: item.voteAverage, style: .compact)
+                         
+                         if let year = item.releaseYear {
+                             Text(year)
+                                 .font(.caption2)
+                                 .foregroundColor(.white.opacity(0.7))
+                                 .padding(.horizontal, 6)
+                                 .padding(.vertical, 3)
+                                 .background(
+                                     Capsule()
+                                         .fill(.ultraThinMaterial)
+                                 )
+                         }
+                     }
+                 }
                 
                 Spacer()
                 
