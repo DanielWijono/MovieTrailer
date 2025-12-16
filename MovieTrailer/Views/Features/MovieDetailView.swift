@@ -23,39 +23,43 @@ struct MovieDetailView: View {
     @State private var isLoadingTrailers = false
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                // Backdrop header - ignores top safe area only
-                backdropHeader
-                
-                // Content - respects all safe areas with proper padding
-                VStack(alignment: .leading, spacing: 24) {
-                    // Title and rating
-                    titleSection
+        ZStack {
+            // Glassmorphism animated background
+            GlassBackgroundView()
+            
+            ScrollView {
+                VStack(spacing: 0) {
+                    // Backdrop header - ignores top safe area only
+                    backdropHeader
                     
-                    // Quick info
-                    quickInfoSection
-                    
-                    // Overview
-                    overviewSection
-                    
-                    // Trailers (if available)
-                    if !trailers.isEmpty {
-                        trailerSection
+                    // Content - respects all safe areas with proper padding
+                    VStack(alignment: .leading, spacing: 24) {
+                        // Title and rating
+                        titleSection
+                        
+                        // Quick info
+                        quickInfoSection
+                        
+                        // Overview
+                        overviewSection
+                        
+                        // Trailers (if available)
+                        if !trailers.isEmpty {
+                            trailerSection
+                        }
+                        
+                        // Genres
+                        genresSection
+                        
+                        // Action buttons
+                        actionButtons
                     }
-                    
-                    // Genres
-                    genresSection
-                    
-                    // Action buttons
-                    actionButtons
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 16)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 16)
-                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .background(Color(uiColor: .systemBackground))
         .ignoresSafeArea(edges: .top) // Only ignore top for backdrop bleed
         .fullScreenCover(isPresented: $showingTrailer) {
             if let trailer = selectedTrailer {
@@ -144,25 +148,20 @@ struct MovieDetailView: View {
     // MARK: - Title Section
     
     private var titleSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 12) {
             Text(movie.title)
-                .font(.title.bold())
-                .foregroundColor(.primary)
+                .font(.largeTitle.bold())
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [.white, .white.opacity(0.8)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
             
             HStack(spacing: 16) {
-                // Rating
-                HStack(spacing: 4) {
-                    Image(systemName: "star.fill")
-                        .foregroundColor(.yellow)
-                    Text(movie.formattedRating)
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                }
-                
-                // Vote count
-                Text("(\(movie.voteCount) reviews)")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                // Use RatingView for detailed display
+                RatingView(rating: movie.voteAverage, voteCount: movie.voteCount, style: .detailed)
             }
         }
     }
@@ -170,16 +169,38 @@ struct MovieDetailView: View {
     // MARK: - Quick Info
     
     private var quickInfoSection: some View {
-        HStack(spacing: 20) {
+        HStack(spacing: 16) {
             if let year = movie.releaseYear {
-                Label(year, systemImage: "calendar")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                HStack(spacing: 6) {
+                    Image(systemName: "calendar")
+                        .font(.caption)
+                        .foregroundColor(.blue)
+                    Text(year)
+                        .font(.subheadline)
+                        .foregroundColor(.white)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(
+                    Capsule()
+                        .fill(.ultraThinMaterial)
+                )
             }
             
-            Label(movie.originalLanguage.uppercased(), systemImage: "globe")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+            HStack(spacing: 6) {
+                Image(systemName: "globe")
+                    .font(.caption)
+                    .foregroundColor(.purple)
+                Text(movie.originalLanguage.uppercased())
+                    .font(.subheadline)
+                    .foregroundColor(.white)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                Capsule()
+                    .fill(.ultraThinMaterial)
+            )
         }
     }
     
@@ -189,10 +210,11 @@ struct MovieDetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Overview")
                 .font(.title3.bold())
+                .foregroundColor(.white)
             
             Text(movie.overview)
                 .font(.body)
-                .foregroundColor(.secondary)
+                .foregroundColor(.white.opacity(0.8))
                 .lineLimit(showingFullOverview ? nil : 4)
             
             if movie.overview.count > 200 {
@@ -203,10 +225,18 @@ struct MovieDetailView: View {
                 } label: {
                     Text(showingFullOverview ? "Show Less" : "Show More")
                         .font(.subheadline.bold())
-                        .foregroundColor(.blue)
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [.blue, .purple],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
                 }
             }
         }
+        .padding()
+        .glassCard()
     }
     
     // MARK: - Genres
@@ -215,29 +245,37 @@ struct MovieDetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Genres")
                 .font(.title3.bold())
+                .foregroundColor(.white)
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(Genre.names(for: movie.genreIds), id: \.self) { genreName in
                         Text(genreName)
                             .font(.subheadline)
+                            .foregroundColor(.white)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
                             .background(
                                 Capsule()
-                                    .fill(
-                                        LinearGradient(
-                                            colors: [.blue.opacity(0.2), .purple.opacity(0.2)],
-                                            startPoint: .leading,
-                                            endPoint: .trailing
-                                        )
+                                    .fill(.ultraThinMaterial)
+                                    .overlay(
+                                        Capsule()
+                                            .stroke(
+                                                LinearGradient(
+                                                    colors: [.blue.opacity(0.5), .purple.opacity(0.5)],
+                                                    startPoint: .leading,
+                                                    endPoint: .trailing
+                                                ),
+                                                lineWidth: 1
+                                            )
                                     )
                             )
-                            .foregroundColor(.primary)
                     }
                 }
             }
         }
+        .padding()
+        .glassCard()
     }
     
     // MARK: - Action Buttons
@@ -279,6 +317,7 @@ struct MovieDetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Trailers")
                 .font(.title3.bold())
+                .foregroundColor(.white)
             
             if trailers.count == 1 {
                 // Single trailer - large button
