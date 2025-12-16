@@ -32,20 +32,19 @@ struct MovieCard: View {
                             .foregroundColor(.primary)
                             .lineLimit(2)
                             .minimumScaleFactor(0.9)
+                            .frame(height: 40, alignment: .top) // Fixed height for title
                         
-                        HStack(spacing: 8) {
+                        HStack(spacing: 6) {
                             // Use RatingView for compact rating display
                             RatingView(rating: movie.voteAverage, style: .compact)
                             
-                            Spacer()
-                            
-                            // Year
+                            // Year badge - no Spacer to keep it inline
                             if let year = movie.releaseYear {
                                 Text(year)
-                                    .font(.caption)
+                                    .font(.caption2)
                                     .foregroundColor(.secondary)
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 4)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 3)
                                     .background(
                                         Capsule()
                                             .fill(.ultraThinMaterial)
@@ -108,6 +107,8 @@ struct MovieCard: View {
             }
             .resizable()
             .aspectRatio(2/3, contentMode: .fill)
+            .frame(height: 240) // Fixed height for consistent alignment
+            .clipped()
             .clipShape(RoundedRectangle(cornerRadius: 12))
     }
     

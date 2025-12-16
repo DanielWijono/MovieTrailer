@@ -66,8 +66,8 @@ struct DiscoverView: View {
                 .padding(.vertical, 20)
             }
         }
-        .navigationTitle("Discover")
-        .navigationBarTitleDisplayMode(.large)
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
         .refreshable {
             await viewModel.refresh()
         }
@@ -142,7 +142,7 @@ struct MovieSection: View {
                 
                 Text(title)
                     .font(.title2.bold())
-                    .foregroundColor(.primary)
+                    .foregroundColor(.white)
                 
                 Spacer()
             }

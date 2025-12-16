@@ -19,6 +19,9 @@ struct TonightView: View {
     
     var body: some View {
         ZStack {
+            // Glassmorphism animated background
+            GlassBackgroundView()
+            
             if viewModel.isLoading && viewModel.recommendations.isEmpty {
                 LoadingView()
             } else if let error = viewModel.error, viewModel.recommendations.isEmpty {
@@ -33,7 +36,6 @@ struct TonightView: View {
                 recommendationsView
             }
         }
-        .background(Color(uiColor: .systemBackground))
         .navigationTitle("Tonight")
         .navigationBarTitleDisplayMode(.large)
         .refreshable {
@@ -51,26 +53,8 @@ struct TonightView: View {
     private var recommendationsView: some View {
         ScrollView {
             VStack(spacing: 32) {
-                // Header
-                VStack(spacing: 12) {
-                    Image(systemName: "star.circle.fill")
-                        .font(.system(size: 60))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [.orange, .pink, .purple],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                    
-                    Text("What to Watch Tonight")
-                        .font(.title.bold())
-                    
-                    Text("Personalized picks just for you")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                .padding(.top, 20)
+                // Premium glass header
+                headerSection
                 
                 // Recommendations grid
                 LazyVGrid(
@@ -99,28 +83,132 @@ struct TonightView: View {
         }
     }
     
+    // MARK: - Header Section
+    
+    private var headerSection: some View {
+        VStack(spacing: 16) {
+            // Animated icon
+            ZStack {
+                // Pulsing glow
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                Color.orange.opacity(0.3),
+                                Color.pink.opacity(0.2),
+                                Color.purple.opacity(0.1),
+                                Color.clear
+                            ],
+                            center: .center,
+                            startRadius: 10,
+                            endRadius: 80
+                        )
+                    )
+                    .frame(width: 120, height: 120)
+                
+                Image(systemName: "star.circle.fill")
+                    .font(.system(size: 60))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.orange, .pink, .purple],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+            }
+            
+            VStack(spacing: 8) {
+                Text("What to Watch Tonight")
+                    .font(.title.bold())
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.white, .white.opacity(0.8)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                
+                Text("Personalized picks just for you")
+                    .font(.subheadline)
+                    .foregroundColor(.white.opacity(0.7))
+                
+                // Recommendation count badge
+                Text("\(viewModel.recommendations.count) movies curated")
+                    .font(.caption.bold())
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(
+                        Capsule()
+                            .fill(.ultraThinMaterial)
+                            .overlay(
+                                Capsule()
+                                    .stroke(
+                                        LinearGradient(
+                                            colors: [.orange.opacity(0.5), .pink.opacity(0.5)],
+                                            startPoint: .leading,
+                                            endPoint: .trailing
+                                        ),
+                                        lineWidth: 1
+                                    )
+                            )
+                    )
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 32)
+        .padding(.horizontal)
+        .glassCard()
+        .padding(.horizontal)
+        .padding(.top, 20)
+    }
+    
     // MARK: - Empty State
     
     private var emptyStateView: some View {
         VStack(spacing: 24) {
-            Image(systemName: "sparkles")
-                .font(.system(size: 80))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [.orange, .pink],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+            ZStack {
+                // Glow effect
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                Color.orange.opacity(0.2),
+                                Color.pink.opacity(0.1),
+                                Color.clear
+                            ],
+                            center: .center,
+                            startRadius: 20,
+                            endRadius: 100
+                        )
                     )
-                )
+                    .frame(width: 160, height: 160)
+                
+                Image(systemName: "sparkles")
+                    .font(.system(size: 80))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.orange, .pink],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+            }
             
-            Text("No Recommendations Yet")
-                .font(.title2.bold())
-            
-            Text("Add some movies to your watchlist to get personalized recommendations!")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 40)
+            VStack(spacing: 12) {
+                Text("No Recommendations Yet")
+                    .font(.title2.bold())
+                    .foregroundColor(.white)
+                
+                Text("Add some movies to your watchlist to get personalized recommendations!")
+                    .font(.subheadline)
+                    .foregroundColor(.white.opacity(0.7))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 40)
+            }
+            .padding()
+            .glassCard()
+            .padding(.horizontal)
             
             Button {
                 Task {
