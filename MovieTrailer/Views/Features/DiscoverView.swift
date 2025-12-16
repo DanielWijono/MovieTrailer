@@ -18,47 +18,54 @@ struct DiscoverView: View {
     }
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 32) {
-                // Trending Section
-                MovieSection(
-                    title: "Trending This Week",
-                    icon: "flame.fill",
-                    iconColor: .orange,
-                    movies: viewModel.trendingMovies,
-                    isLoading: viewModel.isLoadingTrending,
-                    isInWatchlist: viewModel.isInWatchlist,
-                    onMovieTap: onMovieTap,
-                    onWatchlistToggle: viewModel.toggleWatchlist
-                )
-                
-                // Popular Section
-                MovieSection(
-                    title: "Popular Now",
-                    icon: "star.fill",
-                    iconColor: .yellow,
-                    movies: viewModel.popularMovies,
-                    isLoading: viewModel.isLoadingPopular,
-                    isInWatchlist: viewModel.isInWatchlist,
-                    onMovieTap: onMovieTap,
-                    onWatchlistToggle: viewModel.toggleWatchlist
-                )
-                
-                // Top Rated Section
-                MovieSection(
-                    title: "Top Rated",
-                    icon: "trophy.fill",
-                    iconColor: .purple,
-                    movies: viewModel.topRatedMovies,
-                    isLoading: viewModel.isLoadingTopRated,
-                    isInWatchlist: viewModel.isInWatchlist,
-                    onMovieTap: onMovieTap,
-                    onWatchlistToggle: viewModel.toggleWatchlist
-                )
+        ZStack {
+            // Glassmorphism animated background
+            GlassBackgroundView()
+            
+            ScrollView {
+                VStack(spacing: 32) {
+                    // Header with glass card
+                    headerSection
+                    
+                    // Trending Section
+                    MovieSection(
+                        title: "Trending This Week",
+                        icon: "flame.fill",
+                        iconColor: .orange,
+                        movies: viewModel.trendingMovies,
+                        isLoading: viewModel.isLoadingTrending,
+                        isInWatchlist: viewModel.isInWatchlist,
+                        onMovieTap: onMovieTap,
+                        onWatchlistToggle: viewModel.toggleWatchlist
+                    )
+                    
+                    // Popular Section
+                    MovieSection(
+                        title: "Popular Now",
+                        icon: "star.fill",
+                        iconColor: .yellow,
+                        movies: viewModel.popularMovies,
+                        isLoading: viewModel.isLoadingPopular,
+                        isInWatchlist: viewModel.isInWatchlist,
+                        onMovieTap: onMovieTap,
+                        onWatchlistToggle: viewModel.toggleWatchlist
+                    )
+                    
+                    // Top Rated Section
+                    MovieSection(
+                        title: "Top Rated",
+                        icon: "trophy.fill",
+                        iconColor: .purple,
+                        movies: viewModel.topRatedMovies,
+                        isLoading: viewModel.isLoadingTopRated,
+                        isInWatchlist: viewModel.isInWatchlist,
+                        onMovieTap: onMovieTap,
+                        onWatchlistToggle: viewModel.toggleWatchlist
+                    )
+                }
+                .padding(.vertical, 20)
             }
-            .padding(.vertical)
         }
-        .background(Color(uiColor: .systemBackground))
         .navigationTitle("Discover")
         .navigationBarTitleDisplayMode(.large)
         .refreshable {
@@ -78,6 +85,31 @@ struct DiscoverView: View {
                 }
             }
         }
+    }
+    
+    // MARK: - Header Section
+    
+    private var headerSection: some View {
+        VStack(spacing: 12) {
+            Text("Discover Movies")
+                .font(.largeTitle.bold())
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [.white, .white.opacity(0.7)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+            
+            Text("Explore trending, popular, and top-rated films")
+                .font(.subheadline)
+                .foregroundColor(.white.opacity(0.7))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 20)
+        .padding(.horizontal)
+        .glassCard()
+        .padding(.horizontal)
     }
 }
 

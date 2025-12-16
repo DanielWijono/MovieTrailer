@@ -25,34 +25,31 @@ struct MovieCard: View {
                     posterImage
                     
                     // Movie info
-                    VStack(alignment: .leading, spacing: 4) {
+                    VStack(alignment: .leading, spacing: 6) {
                         Text(movie.title)
                             .font(.headline)
                             .fontWeight(.semibold)
                             .foregroundColor(.primary)
                             .lineLimit(2)
+                            .minimumScaleFactor(0.9)
                         
                         HStack(spacing: 8) {
-                            // Rating
-                            HStack(spacing: 4) {
-                                Image(systemName: "star.fill")
-                                    .font(.caption)
-                                    .foregroundColor(.yellow)
-                                
-                                Text(movie.formattedRating)
-                                    .font(.caption)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(.primary)
-                            }
+                            // Use RatingView for compact rating display
+                            RatingView(rating: movie.voteAverage, style: .compact)
+                            
+                            Spacer()
                             
                             // Year
                             if let year = movie.releaseYear {
-                                Text("•")
-                                    .foregroundColor(.secondary)
-                                
                                 Text(year)
                                     .font(.caption)
                                     .foregroundColor(.secondary)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(
+                                        Capsule()
+                                            .fill(.ultraThinMaterial)
+                                    )
                             }
                         }
                     }
