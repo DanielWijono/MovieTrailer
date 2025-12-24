@@ -205,4 +205,4 @@ final class SearchViewModelTests: XCTestCase {
             video: false
         )
     }
-}
+

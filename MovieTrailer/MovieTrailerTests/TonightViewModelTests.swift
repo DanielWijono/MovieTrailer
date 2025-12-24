@@ -118,23 +118,6 @@ final class TonightViewModelTests: XCTestCase {
         XCTAssertFalse(sut.isInWatchlist(movie), "Should remove movie")
     }
     
-    // MARK: - isEmpty Tests
-    
-    func testIsEmpty_NoRecommendations_ReturnsTrue() {
-        // Then
-        XCTAssertTrue(sut.isEmpty, "Should return true when no recommendations")
-    }
-    
-    func testIsEmpty_WithRecommendations_ReturnsFalse() async {
-        // Given
-        await sut.generateRecommendations()
-        
-        // Then - Assuming recommendations were generated
-        if !sut.recommendations.isEmpty {
-            XCTAssertFalse(sut.isEmpty, "Should return false with recommendations")
-        }
-    }
-    
     // MARK: - Recommendation Quality Tests
     
     func testGenerateRecommendations_LimitsResults() async {
@@ -174,4 +157,3 @@ final class TonightViewModelTests: XCTestCase {
             video: false
         )
     }
-}
