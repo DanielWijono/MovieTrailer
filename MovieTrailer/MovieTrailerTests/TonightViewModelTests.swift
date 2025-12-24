@@ -36,7 +36,7 @@ final class TonightViewModelTests: XCTestCase {
     
     func testInit_SetsInitialState() {
         // Then
-        XCTAssertTrue(sut.recommendedMovies.isEmpty, "Recommended movies should be empty initially")
+        XCTAssertTrue(sut.recommendations.isEmpty, "Recommended movies should be empty initially")
         XCTAssertFalse(sut.isLoading, "Should not be loading initially")
         XCTAssertNil(sut.error, "Error should be nil initially")
     }
@@ -52,25 +52,25 @@ final class TonightViewModelTests: XCTestCase {
         XCTAssertNil(sut.error, "Error should be nil on success")
         
         // Should generate recommendations even with empty watchlist (based on popular movies)
-        XCTAssertFalse(sut.recommendedMovies.isEmpty, "Should generate recommendations")
+        XCTAssertFalse(sut.recommendations.isEmpty, "Should generate recommendations")
     }
     
     func testGenerateRecommendations_WithWatchlistItems_GeneratesPersonalizedRecommendations() async {
         // Given
-        let movie = Movie.sample
+        let movie = createTestMovie()
         mockWatchlistManager.add(movie)
         
         // When
         await sut.generateRecommendations()
         
         // Then
-        XCTAssertFalse(sut.recommendedMovies.isEmpty, "Should generate personalized recommendations")
+        XCTAssertFalse(sut.recommendations.isEmpty, "Should generate personalized recommendations")
         XCTAssertNil(sut.error, "Error should be nil")
     }
     
     func testGenerateRecommendations_FiltersWatchlistMovies() async {
         // Given
-        let movie = Movie.sample
+        let movie = createTestMovie()
         mockWatchlistManager.add(movie)
         
         // When
@@ -78,7 +78,7 @@ final class TonightViewModelTests: XCTestCase {
         
         // Then
         // Recommendations should not include movies already in watchlist
-        let containsWatchlistMovie = sut.recommendedMovies.contains { $0.id == movie.id }
+        let containsWatchlistMovie = sut.recommendations.contains { $0.id == movie.id }
         XCTAssertFalse(containsWatchlistMovie, "Should not recommend movies already in watchlist")
     }
     
@@ -86,7 +86,7 @@ final class TonightViewModelTests: XCTestCase {
     
     func testIsInWatchlist_MovieNotInWatchlist_ReturnsFalse() {
         // Given
-        let movie = Movie.sample
+        let movie = createTestMovie()
         
         // Then
         XCTAssertFalse(sut.isInWatchlist(movie), "Should return false")
@@ -94,7 +94,7 @@ final class TonightViewModelTests: XCTestCase {
     
     func testIsInWatchlist_MovieInWatchlist_ReturnsTrue() async {
         // Given
-        let movie = Movie.sample
+        let movie = createTestMovie()
         mockWatchlistManager.add(movie)
         
         // Then
@@ -103,16 +103,16 @@ final class TonightViewModelTests: XCTestCase {
     
     func testToggleWatchlist_AddsAndRemoves() async {
         // Given
-        let movie = Movie.sample
+        let movie = createTestMovie()
         
         // When - Add
-        await sut.toggleWatchlist(for: movie)
+        sut.toggleWatchlist(for: movie)
         
         // Then
         XCTAssertTrue(sut.isInWatchlist(movie), "Should add movie")
         
         // When - Remove
-        await sut.toggleWatchlist(for: movie)
+        sut.toggleWatchlist(for: movie)
         
         // Then
         XCTAssertFalse(sut.isInWatchlist(movie), "Should remove movie")
@@ -130,7 +130,7 @@ final class TonightViewModelTests: XCTestCase {
         await sut.generateRecommendations()
         
         // Then - Assuming recommendations were generated
-        if !sut.recommendedMovies.isEmpty {
+        if !sut.recommendations.isEmpty {
             XCTAssertFalse(sut.isEmpty, "Should return false with recommendations")
         }
     }
@@ -142,7 +142,7 @@ final class TonightViewModelTests: XCTestCase {
         await sut.generateRecommendations()
         
         // Then
-        XCTAssertLessThanOrEqual(sut.recommendedMovies.count, 20, "Should limit recommendations")
+        XCTAssertLessThanOrEqual(sut.recommendations.count, 20, "Should limit recommendations")
     }
     
     func testGenerateRecommendations_HighQualityMovies() async {
@@ -150,8 +150,28 @@ final class TonightViewModelTests: XCTestCase {
         await sut.generateRecommendations()
         
         // Then - All recommendations should have decent ratings
-        for movie in sut.recommendedMovies {
+        for movie in sut.recommendations {
             XCTAssertGreaterThanOrEqual(movie.voteAverage, 0, "Should have valid rating")
         }
+    }
+}
+    
+    private func createTestMovie() -> Movie {
+        Movie(
+            id: 1,
+            title: "Test Movie",
+            overview: "Test Overview",
+            posterPath: "/test.jpg",
+            backdropPath: "/backdrop.jpg",
+            releaseDate: "2024-01-01",
+            voteAverage: 8.5,
+            voteCount: 1000,
+            popularity: 100.0,
+            genreIds: [28, 12],
+            adult: false,
+            originalLanguage: "en",
+            originalTitle: "Test Movie",
+            video: false
+        )
     }
 }

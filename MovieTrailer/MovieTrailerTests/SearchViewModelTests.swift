@@ -122,7 +122,7 @@ final class SearchViewModelTests: XCTestCase {
     
     func testIsInWatchlist_MovieNotInWatchlist_ReturnsFalse() {
         // Given
-        let movie = Movie.sample
+        let movie = createTestMovie()
         
         // Then
         XCTAssertFalse(sut.isInWatchlist(movie), "Should return false")
@@ -130,7 +130,7 @@ final class SearchViewModelTests: XCTestCase {
     
     func testIsInWatchlist_MovieInWatchlist_ReturnsTrue() async {
         // Given
-        let movie = Movie.sample
+        let movie = createTestMovie()
         mockWatchlistManager.add(movie)
         
         // Then
@@ -139,7 +139,7 @@ final class SearchViewModelTests: XCTestCase {
     
     func testToggleWatchlist_AddsAndRemoves() async {
         // Given
-        let movie = Movie.sample
+        let movie = createTestMovie()
         
         // When - Add
         await sut.toggleWatchlist(for: movie)
@@ -184,5 +184,25 @@ final class SearchViewModelTests: XCTestCase {
         
         // Then
         XCTAssertNil(sut.error, "Error should be cleared on successful search")
+    }
+}
+    
+    private func createTestMovie() -> Movie {
+        Movie(
+            id: 1,
+            title: "Test Movie",
+            overview: "Test Overview",
+            posterPath: "/test.jpg",
+            backdropPath: "/backdrop.jpg",
+            releaseDate: "2024-01-01",
+            voteAverage: 8.5,
+            voteCount: 1000,
+            popularity: 100.0,
+            genreIds: [28, 12],
+            adult: false,
+            originalLanguage: "en",
+            originalTitle: "Test Movie",
+            video: false
+        )
     }
 }
