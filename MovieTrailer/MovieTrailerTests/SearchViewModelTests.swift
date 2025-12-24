@@ -131,7 +131,7 @@ final class SearchViewModelTests: XCTestCase {
     func testIsInWatchlist_MovieInWatchlist_ReturnsTrue() async {
         // Given
         let movie = Movie.sample
-        await mockWatchlistManager.addToWatchlist(movie)
+        mockWatchlistManager.add(movie)
         
         // Then
         XCTAssertTrue(sut.isInWatchlist(movie), "Should return true")

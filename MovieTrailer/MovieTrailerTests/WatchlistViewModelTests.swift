@@ -45,7 +45,7 @@ final class WatchlistViewModelTests: XCTestCase {
     func testItems_WithMovies_ReturnsAllItems() async {
         // Given
         let movie = Movie.sample
-        await mockWatchlistManager.addToWatchlist(movie)
+        mockWatchlistManager.add(movie)
         
         // Then
         XCTAssertEqual(sut.items.count, 1, "Should return all items")
@@ -73,9 +73,9 @@ final class WatchlistViewModelTests: XCTestCase {
             video: false
         )
         
-        await mockWatchlistManager.addToWatchlist(movie1)
+        mockWatchlistManager.add(movie1)
         try? await Task.sleep(nanoseconds: 100_000_000) // Small delay
-        await mockWatchlistManager.addToWatchlist(movie2)
+        mockWatchlistManager.add(movie2)
         
         // When
         sut.sortOption = .dateAdded
@@ -123,8 +123,8 @@ final class WatchlistViewModelTests: XCTestCase {
             video: false
         )
         
-        await mockWatchlistManager.addToWatchlist(movieB)
-        await mockWatchlistManager.addToWatchlist(movieA)
+        mockWatchlistManager.add(movieB)
+        mockWatchlistManager.add(movieA)
         
         // When
         sut.sortOption = .title
@@ -170,8 +170,8 @@ final class WatchlistViewModelTests: XCTestCase {
             video: false
         )
         
-        await mockWatchlistManager.addToWatchlist(lowRatedMovie)
-        await mockWatchlistManager.addToWatchlist(highRatedMovie)
+        mockWatchlistManager.add(lowRatedMovie)
+        mockWatchlistManager.add(highRatedMovie)
         
         // When
         sut.sortOption = .rating
@@ -186,7 +186,7 @@ final class WatchlistViewModelTests: XCTestCase {
     func testRemoveItem_RemovesFromWatchlist() async {
         // Given
         let movie = Movie.sample
-        await mockWatchlistManager.addToWatchlist(movie)
+        mockWatchlistManager.add(movie)
         let item = sut.items.first!
         
         // When
@@ -206,7 +206,7 @@ final class WatchlistViewModelTests: XCTestCase {
     
     func testCount_WithItems_ReturnsCorrectCount() async {
         // Given
-        await mockWatchlistManager.addToWatchlist(Movie.sample)
+        mockWatchlistManager.add(Movie.sample)
         
         // Then
         XCTAssertEqual(sut.count, 1, "Count should be 1")
@@ -221,7 +221,7 @@ final class WatchlistViewModelTests: XCTestCase {
     
     func testIsEmpty_WithItems_ReturnsFalse() async {
         // Given
-        await mockWatchlistManager.addToWatchlist(Movie.sample)
+        mockWatchlistManager.add(Movie.sample)
         
         // Then
         XCTAssertFalse(sut.isEmpty, "Should return false")
@@ -231,7 +231,7 @@ final class WatchlistViewModelTests: XCTestCase {
     
     func testGenerateShareImage_CreatesImage() async {
         // Given
-        await mockWatchlistManager.addToWatchlist(Movie.sample)
+        mockWatchlistManager.add(Movie.sample)
         
         // When
         await sut.generateShareImage()

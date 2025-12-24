@@ -24,50 +24,41 @@ final class TMDBServiceTests: XCTestCase {
         mockSession = nil
     }
     
-    // MARK: - fetchTrendingMovies Tests
+    // MARK: - fetchTrending Tests
     
-    func testFetchTrendingMovies_Success() async throws {
-        // Given
-        let mockMovies = [
-            Movie.sample,
-            Movie(id: 2, title: "Movie 2", overview: "Overview 2", posterPath: nil,
-                  backdropPath: nil, releaseDate: "2024-01-01", voteAverage: 7.0,
-                  voteCount: 100, popularity: 50.0, genreIds: [18], adult: false,
-                  originalLanguage: "en", originalTitle: "Movie 2", video: false)
-        ]
-        
+    func testFetchTrending_Success() async throws {
         // When
-        let response = try await sut.fetchTrendingMovies()
+        let response = try await sut.fetchTrending(page: 1)
         
         // Then
         XCTAssertFalse(response.results.isEmpty, "Should return movies")
         XCTAssertGreaterThan(response.results.count, 0, "Should have at least one movie")
     }
     
-    func testFetchTrendingMovies_EmptyResults() async throws {
+    func testFetchTrending_EmptyResults() async throws {
         // When
-        let response = try await sut.fetchTrendingMovies()
+        let response = try await sut.fetchTrending(page: 1)
         
         // Then
         XCTAssertNotNil(response, "Response should not be nil even if empty")
     }
     
-    // MARK: - fetchPopularMovies Tests
+    // MARK: - fetchPopular Tests
     
-    func testFetchPopularMovies_Success() async throws {
+    func testFetchPopular_Success() async throws {
         // When
-        let response = try await sut.fetchPopularMovies()
+        let response = try await sut.fetchPopular(page: 1)
         
         // Then
         XCTAssertFalse(response.results.isEmpty, "Should return popular movies")
         XCTAssertGreaterThan(response.page, 0, "Page should be greater than 0")
     }
     
-    // MARK: - fetchTopRatedMovies Tests
+    // MARK: - fetchTopRated Tests
     
-    func testFetchTopRatedMovies_Success() async throws {
+    func testFetchTopRated_Success() async throws {
         // When
-        let response = try await sut.fetchTopRatedMovies()
+        let response = try await sut.fetchTopRated(page: 1)
         
         // Then
         XCTAssertFalse(response.results.isEmpty, "Should return top rated movies")
@@ -78,7 +69,7 @@ final class TMDBServiceTests: XCTestCase {
     
     // MARK: - searchMovies Tests
     
-    func testSearchMovies_ValidQuery_ReturnsResults() async throws {
+    func testSearch_ValidQuery_ReturnsResults() async throws {
         // Given
         let query = "Inception"
         

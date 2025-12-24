@@ -58,7 +58,7 @@ final class TonightViewModelTests: XCTestCase {
     func testGenerateRecommendations_WithWatchlistItems_GeneratesPersonalizedRecommendations() async {
         // Given
         let movie = Movie.sample
-        await mockWatchlistManager.addToWatchlist(movie)
+        mockWatchlistManager.add(movie)
         
         // When
         await sut.generateRecommendations()
@@ -71,7 +71,7 @@ final class TonightViewModelTests: XCTestCase {
     func testGenerateRecommendations_FiltersWatchlistMovies() async {
         // Given
         let movie = Movie.sample
-        await mockWatchlistManager.addToWatchlist(movie)
+        mockWatchlistManager.add(movie)
         
         // When
         await sut.generateRecommendations()
@@ -95,7 +95,7 @@ final class TonightViewModelTests: XCTestCase {
     func testIsInWatchlist_MovieInWatchlist_ReturnsTrue() async {
         // Given
         let movie = Movie.sample
-        await mockWatchlistManager.addToWatchlist(movie)
+        mockWatchlistManager.add(movie)
         
         // Then
         XCTAssertTrue(sut.isInWatchlist(movie), "Should return true")
