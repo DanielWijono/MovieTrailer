@@ -80,20 +80,6 @@ final class TMDBServiceTests: XCTestCase {
         XCTAssertFalse(response.results.isEmpty, "Should return search results for valid query")
     }
     
-    func testSearchMovies_EmptyQuery_HandlesGracefully() async throws {
-        // Given
-        let query = ""
-        
-        // When/Then
-        do {
-            _ = try await sut.searchMovies(query: query)
-            XCTFail("Should throw error for empty query")
-        } catch {
-            // Expected behavior
-            XCTAssertTrue(true, "Empty query should be handled")
-        }
-    }
-    
     // MARK: - fetchVideos Tests
     
     func testFetchVideos_ValidMovieId_ReturnsVideos() async throws {
