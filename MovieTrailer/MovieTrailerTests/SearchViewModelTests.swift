@@ -25,7 +25,7 @@ final class SearchViewModelTests: XCTestCase {
         )
     }
     
-    override func tearDown() async {
+    override func tearDown() async throws {
         await mockWatchlistManager.clearAll()
         sut = nil
         mockTMDBService = nil

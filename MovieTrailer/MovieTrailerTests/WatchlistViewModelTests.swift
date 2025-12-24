@@ -20,7 +20,7 @@ final class WatchlistViewModelTests: XCTestCase {
         sut = WatchlistViewModel(watchlistManager: mockWatchlistManager)
     }
     
-    override func tearDown() async {
+    override func tearDown() async throws {
         await mockWatchlistManager.clearAll()
         sut = nil
         mockWatchlistManager = nil

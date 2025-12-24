@@ -36,7 +36,7 @@ final class WatchlistManagerTests: XCTestCase {
         )
     }
     
-    override func tearDown() async {
+    override func tearDown() async throws {
         await sut.clearAll()
         sut = nil
         testMovie = nil
