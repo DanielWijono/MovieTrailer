@@ -39,7 +39,7 @@ final class DiscoverViewModelTests: XCTestCase {
         XCTAssertTrue(sut.trendingMovies.isEmpty, "Trending movies should be empty initially")
         XCTAssertTrue(sut.popularMovies.isEmpty, "Popular movies should be empty initially")
         XCTAssertTrue(sut.topRatedMovies.isEmpty, "Top rated movies should be empty initially")
-        XCTAssertFalse(sut.isLoading, "Should not be loading initially")
+        XCTAssertFalse(sut.isLoadingTrending, "Should not be loading initially")
         XCTAssertNil(sut.error, "Error should be nil initially")
     }
     
@@ -50,7 +50,7 @@ final class DiscoverViewModelTests: XCTestCase {
         await sut.loadContent()
         
         // Then
-        XCTAssertFalse(sut.isLoading, "Should not be loading after completion")
+        XCTAssertFalse(sut.isLoadingTrending, "Should not be loading after completion")
         XCTAssertNil(sut.error, "Error should be nil on success")
         
         // At least one category should have movies
@@ -83,33 +83,33 @@ final class DiscoverViewModelTests: XCTestCase {
     
     func testIsInWatchlist_MovieNotInWatchlist_ReturnsFalse() {
         // Given
-        let movie = Movie.sample
+        let movie = createTestMovie()
         
         // Then
         XCTAssertFalse(sut.isInWatchlist(movie), "Should return false for movie not in watchlist")
     }
     
-    func testIsInWatchlist_MovieInWatchlist_ReturnsTrue() async {
+    func testIsInWatchlist_MovieInWatchlist_ReturnsTrue() {
         // Given
-        let movie = Movie.sample
-        await mockWatchlistManager.addToWatchlist(movie)
+        let movie = createTestMovie()
+        mockWatchlistManager.add(movie)
         
         // Then
         XCTAssertTrue(sut.isInWatchlist(movie), "Should return true for movie in watchlist")
     }
     
-    func testToggleWatchlist_AddsAndRemoves() async {
+    func testToggleWatchlist_AddsAndRemoves() {
         // Given
-        let movie = Movie.sample
+        let movie = createTestMovie()
         
         // When - Add
-        await sut.toggleWatchlist(for: movie)
+        sut.toggleWatchlist(for: movie)
         
         // Then
         XCTAssertTrue(sut.isInWatchlist(movie), "Should add movie to watchlist")
         
         // When - Remove
-        await sut.toggleWatchlist(for: movie)
+        sut.toggleWatchlist(for: movie)
         
         // Then
         XCTAssertFalse(sut.isInWatchlist(movie), "Should remove movie from watchlist")
@@ -127,12 +127,10 @@ final class DiscoverViewModelTests: XCTestCase {
         // Then
         XCTAssertNil(sut.error, "Error should be cleared on successful load")
     }
-}
-
-// MARK: - Test Helpers
-
-extension Movie {
-    static var sample: Movie {
+    
+    // MARK: - Helper Methods
+    
+    private func createTestMovie() -> Movie {
         Movie(
             id: 1,
             title: "Test Movie",

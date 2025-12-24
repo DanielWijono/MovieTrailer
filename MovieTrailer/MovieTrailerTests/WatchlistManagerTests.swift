@@ -16,7 +16,7 @@ final class WatchlistManagerTests: XCTestCase {
     
     override func setUp() async throws {
         sut = WatchlistManager()
-        await sut.clearAll() // Start fresh
+        sut.clearAll() // Start fresh
         
         testMovie = Movie(
             id: 999,
@@ -37,34 +37,34 @@ final class WatchlistManagerTests: XCTestCase {
     }
     
     override func tearDown() async throws {
-        await sut.clearAll()
+        sut.clearAll()
         sut = nil
         testMovie = nil
     }
     
     // MARK: - Add to Watchlist Tests
     
-    func testAddToWatchlist_NewMovie_AddsSuccessfully() async {
+    func testAddToWatchlist_NewMovie_AddsSuccessfully() {
         // When
-        await sut.addToWatchlist(testMovie)
+        sut.add(testMovie)
         
         // Then
-        XCTAssertTrue(sut.isInWatchlist(testMovie), "Movie should be in watchlist")
+        XCTAssertTrue(sut.contains(testMovie), "Movie should be in watchlist")
         XCTAssertEqual(sut.count, 1, "Watchlist count should be 1")
     }
     
-    func testAddToWatchlist_DuplicateMovie_DoesNotAddTwice() async {
+    func testAddToWatchlist_DuplicateMovie_DoesNotAddTwice() {
         // Given
-        await sut.addToWatchlist(testMovie)
+        sut.add(testMovie)
         
         // When
-        await sut.addToWatchlist(testMovie)
+        sut.add(testMovie)
         
         // Then
         XCTAssertEqual(sut.count, 1, "Should not add duplicate")
     }
     
-    func testAddToWatchlist_MultipleMovies_AddsAll() async {
+    func testAddToWatchlist_MultipleMovies_AddsAll() {
         // Given
         let movie2 = Movie(
             id: 1000,
@@ -84,32 +84,32 @@ final class WatchlistManagerTests: XCTestCase {
         )
         
         // When
-        await sut.addToWatchlist(testMovie)
-        await sut.addToWatchlist(movie2)
+        sut.add(testMovie)
+        sut.add(movie2)
         
         // Then
         XCTAssertEqual(sut.count, 2, "Should have 2 movies")
-        XCTAssertTrue(sut.isInWatchlist(testMovie), "First movie should be in watchlist")
-        XCTAssertTrue(sut.isInWatchlist(movie2), "Second movie should be in watchlist")
+        XCTAssertTrue(sut.contains(testMovie), "First movie should be in watchlist")
+        XCTAssertTrue(sut.contains(movie2), "Second movie should be in watchlist")
     }
     
     // MARK: - Remove from Watchlist Tests
     
-    func testRemoveFromWatchlist_ExistingMovie_RemovesSuccessfully() async {
+    func testRemoveFromWatchlist_ExistingMovie_RemovesSuccessfully() {
         // Given
-        await sut.addToWatchlist(testMovie)
+        sut.add(testMovie)
         
         // When
-        await sut.removeFromWatchlist(testMovie)
+        sut.remove(testMovie)
         
         // Then
-        XCTAssertFalse(sut.isInWatchlist(testMovie), "Movie should not be in watchlist")
+        XCTAssertFalse(sut.contains(testMovie), "Movie should not be in watchlist")
         XCTAssertEqual(sut.count, 0, "Watchlist should be empty")
     }
     
-    func testRemoveFromWatchlist_NonExistentMovie_NoError() async {
+    func testRemoveFromWatchlist_NonExistentMovie_NoError() {
         // When
-        await sut.removeFromWatchlist(testMovie)
+        sut.remove(testMovie)
         
         // Then
         XCTAssertEqual(sut.count, 0, "Watchlist should still be empty")
@@ -117,45 +117,45 @@ final class WatchlistManagerTests: XCTestCase {
     
     // MARK: - Toggle Watchlist Tests
     
-    func testToggleWatchlist_NotInList_Adds() async {
+    func testToggleWatchlist_NotInList_Adds() {
         // When
-        await sut.toggleWatchlist(for: testMovie)
+        sut.toggle(testMovie)
         
         // Then
-        XCTAssertTrue(sut.isInWatchlist(testMovie), "Movie should be added")
+        XCTAssertTrue(sut.contains(testMovie), "Movie should be added")
     }
     
-    func testToggleWatchlist_InList_Removes() async {
+    func testToggleWatchlist_InList_Removes() {
         // Given
-        await sut.addToWatchlist(testMovie)
+        sut.add(testMovie)
         
         // When
-        await sut.toggleWatchlist(for: testMovie)
+        sut.toggle(testMovie)
         
         // Then
-        XCTAssertFalse(sut.isInWatchlist(testMovie), "Movie should be removed")
+        XCTAssertFalse(sut.contains(testMovie), "Movie should be removed")
     }
     
     // MARK: - IsInWatchlist Tests
     
-    func testIsInWatchlist_MovieInList_ReturnsTrue() async {
+    func testIsInWatchlist_MovieInList_ReturnsTrue() {
         // Given
-        await sut.addToWatchlist(testMovie)
+        sut.add(testMovie)
         
         // Then
-        XCTAssertTrue(sut.isInWatchlist(testMovie), "Should return true for movie in watchlist")
+        XCTAssertTrue(sut.contains(testMovie), "Should return true for movie in watchlist")
     }
     
     func testIsInWatchlist_MovieNotInList_ReturnsFalse() {
         // Then
-        XCTAssertFalse(sut.isInWatchlist(testMovie), "Should return false for movie not in watchlist")
+        XCTAssertFalse(sut.contains(testMovie), "Should return false for movie not in watchlist")
     }
     
     // MARK: - Clear All Tests
     
-    func testClearAll_WithMovies_RemovesAll() async {
+    func testClearAll_WithMovies_RemovesAll() {
         // Given
-        await sut.addToWatchlist(testMovie)
+        sut.add(testMovie)
         let movie2 = Movie(
             id: 1000,
             title: "Movie 2",
@@ -172,14 +172,14 @@ final class WatchlistManagerTests: XCTestCase {
             originalTitle: "Movie 2",
             video: false
         )
-        await sut.addToWatchlist(movie2)
+        sut.add(movie2)
         
         // When
-        await sut.clearAll()
+        sut.clearAll()
         
         // Then
         XCTAssertEqual(sut.count, 0, "Watchlist should be empty")
-        XCTAssertFalse(sut.isInWatchlist(testMovie), "No movies should be in watchlist")
+        XCTAssertFalse(sut.contains(testMovie), "No movies should be in watchlist")
     }
     
     // MARK: - Count Tests
@@ -189,9 +189,9 @@ final class WatchlistManagerTests: XCTestCase {
         XCTAssertEqual(sut.count, 0, "Empty watchlist should have count 0")
     }
     
-    func testCount_WithMovies_ReturnsCorrectCount() async {
+    func testCount_WithMovies_ReturnsCorrectCount() {
         // Given
-        await sut.addToWatchlist(testMovie)
+        sut.add(testMovie)
         
         // Then
         XCTAssertEqual(sut.count, 1, "Count should match number of movies")
@@ -204,9 +204,9 @@ final class WatchlistManagerTests: XCTestCase {
         XCTAssertTrue(sut.items.isEmpty, "Items should be empty array")
     }
     
-    func testItems_WithMovies_ReturnsAllItems() async {
+    func testItems_WithMovies_ReturnsAllItems() {
         // Given
-        await sut.addToWatchlist(testMovie)
+        sut.add(testMovie)
         
         // Then
         XCTAssertEqual(sut.items.count, 1, "Should return all items")
@@ -220,9 +220,9 @@ final class WatchlistManagerTests: XCTestCase {
         XCTAssertTrue(sut.isEmpty, "Empty watchlist should return true")
     }
     
-    func testIsEmpty_WithMovies_ReturnsFalse() async {
+    func testIsEmpty_WithMovies_ReturnsFalse() {
         // Given
-        await sut.addToWatchlist(testMovie)
+        sut.add(testMovie)
         
         // Then
         XCTAssertFalse(sut.isEmpty, "Watchlist with movies should return false")
